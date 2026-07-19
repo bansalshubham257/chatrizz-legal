@@ -1,0 +1,47 @@
+name: chatrizz
+description: "AI Dating Assistant That Remembers Every Match"
+publish_to: 'none'
+version: 2.2.0+5
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  provider: ^6.1.2
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  http: ^1.2.2
+  google_mobile_ads: ^5.2.0
+  google_sign_in: ^6.3.0
+  firebase_core: ^3.9.0
+  firebase_analytics: ^11.4.0
+  firebase_crashlytics: ^4.2.0
+  in_app_purchase: ^3.2.0
+  image_picker: ^1.1.2
+  google_mlkit_text_recognition: ^0.14.0
+  intl: ^0.19.0
+  uuid: ^4.5.1
+  cached_network_image: ^3.4.1
+  shimmer: ^3.0.0
+  flutter_slidable: ^3.1.1
+  url_launcher: ^6.3.1
+  share_plus: ^10.1.4
+  path_provider: ^2.1.5
+  shared_preferences: ^2.3.0
+  connectivity_plus: ^6.1.1
+  flutter_local_notifications: ^18.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/splash.png
