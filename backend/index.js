@@ -16,8 +16,10 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex');
 
 if (!GOOGLE_CLIENT_ID) {
-  console.error('GOOGLE_CLIENT_ID environment variable is required');
-  process.exit(1);
+  console.error('WARNING: GOOGLE_CLIENT_ID not set');
+}
+if (!process.env.DB_PASSWORD) {
+  console.error('WARNING: DB_PASSWORD not set');
 }
 
 const pool = new Pool({
@@ -26,12 +28,13 @@ const pool = new Pool({
   database: process.env.DB_NAME || 'chatrizz_db',
   user: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASSWORD,
+  connectionTimeoutMillis: 5000,
+  idleTimeoutMillis: 10000,
 });
 
-if (!pool.password) {
-  console.error('DB_PASSWORD environment variable is required');
-  process.exit(1);
-}
+pool.on('error', (err) => {
+  console.error('Database pool error:', err.message);
+});
 
 const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
@@ -199,8 +202,13 @@ app.delete('/user', authMiddleware, async (req, res) => {
   }
 });
 
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
+app.get('/health', async (req, res) => {
+  try {
+    await pool.query('SELECT 1');
+    res.json({ status: 'ok', db: 'connected' });
+  } catch (err) {
+    res.status(503).json({ status: 'degraded', db: err.message });
+  }
 });
 
 app.listen(PORT, () => {
