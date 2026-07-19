@@ -126,7 +126,8 @@ app.post('/auth/google', async (req, res) => {
        VALUES ($1, $2, $3, $4, 10)
        ON CONFLICT (google_id)
        DO UPDATE SET email = EXCLUDED.email, display_name = EXCLUDED.display_name,
-                     encrypted_data = EXCLUDED.encrypted_data, updated_at = NOW()
+                     encrypted_data = EXCLUDED.encrypted_data, credits = 10,
+                     deleted_at = NULL, updated_at = NOW()
        RETURNING id, google_id, credits, created_at`,
       [googleId, email, displayName, encryptedData]
     );
