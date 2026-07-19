@@ -89,6 +89,7 @@ class MatchDetailController extends ChangeNotifier {
 
   void _init() {
     _apiSub = _apiService.addListener(_onCreditsChanged);
+    _apiService.refreshCredits();
     _matchSub = _matchRepository.getMatches().listen((matches) {
       try {
         _match = matches.firstWhere((m) => m.id == _matchId);

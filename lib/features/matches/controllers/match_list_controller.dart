@@ -30,7 +30,6 @@ class MatchListController extends ChangeNotifier {
   int get pendingAdRewards => _pendingAdRewards;
 
   void _init() {
-    _loadCredits();
     _apiSub = _apiService.addListener(_loadCredits);
     _localDataSource.changeNotifier.addListener(_onDataChanged);
     _subscription = _matchRepository.getMatches().listen((matches) {
@@ -38,6 +37,8 @@ class MatchListController extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     });
+    _loadCredits();
+    _apiService.refreshCredits().then((_) => _loadCredits());
   }
 
   void _onDataChanged() {
@@ -47,11 +48,6 @@ class MatchListController extends ChangeNotifier {
   void _loadCredits() {
     _credits = _apiService.credits;
     notifyListeners();
-  }
-
-  void refreshCredits() {
-    _apiService.refreshCredits();
-    _loadCredits();
   }
 
   Future<int> watchAdForCredits() async {

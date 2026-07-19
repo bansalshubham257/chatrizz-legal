@@ -42,7 +42,7 @@ class ChatRizzApp extends StatefulWidget {
   State<ChatRizzApp> createState() => _ChatRizzAppState();
 }
 
-class _ChatRizzAppState extends State<ChatRizzApp> {
+class _ChatRizzAppState extends State<ChatRizzApp> with WidgetsBindingObserver {
   late final LocalDataSource _localDataSource;
   late final PaymentService _paymentService;
   late final AiService _aiService;
@@ -52,6 +52,7 @@ class _ChatRizzAppState extends State<ChatRizzApp> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _localDataSource = widget.localDataSource;
     _paymentService = PaymentService();
     _paymentService.init();
@@ -63,10 +64,18 @@ class _ChatRizzAppState extends State<ChatRizzApp> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _paymentService.dispose();
     _adService.dispose();
     _apiService.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _apiService.refreshCredits();
+    }
   }
 
   @override

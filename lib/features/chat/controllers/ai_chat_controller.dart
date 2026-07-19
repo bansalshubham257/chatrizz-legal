@@ -35,6 +35,7 @@ class AiChatController extends ChangeNotifier {
         _apiService = apiService {
     _apiListener = () => notifyListeners();
     _apiService.addListener(_apiListener!);
+    _apiService.refreshCredits();
     _loadCategories();
   }
 
