@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:chatrizz/app/theme/app_theme.dart';
 import 'package:chatrizz/core/constants/app_constants.dart';
 import 'package:chatrizz/data/datasources/local/local_datasource.dart';
@@ -30,13 +31,16 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final localDataSource = LocalDataSource();
   await localDataSource.init();
-  runApp(ChatRizzApp(localDataSource: localDataSource));
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('auth_token');
+  runApp(ChatRizzApp(localDataSource: localDataSource, initialToken: token));
 }
 
 class ChatRizzApp extends StatefulWidget {
   final LocalDataSource localDataSource;
+  final String? initialToken;
 
-  const ChatRizzApp({super.key, required this.localDataSource});
+  const ChatRizzApp({super.key, required this.localDataSource, this.initialToken});
 
   @override
   State<ChatRizzApp> createState() => _ChatRizzAppState();
@@ -59,7 +63,7 @@ class _ChatRizzAppState extends State<ChatRizzApp> with WidgetsBindingObserver {
     _aiService = AiService();
     _adService = AdService();
     _adService.init();
-    _apiService = ApiService();
+    _apiService = ApiService(initialToken: widget.initialToken);
   }
 
   @override

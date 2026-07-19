@@ -17,15 +17,10 @@ class ApiService extends ChangeNotifier {
   bool get loading => _loading;
   bool get isSignedIn => _token != null;
 
-  ApiService() {
-    _loadToken();
-  }
-
-  Future<void> _loadToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    _token = prefs.getString(_tokenKey);
+  ApiService({String? initialToken}) {
+    _token = initialToken;
     if (_token != null) {
-      await refreshCredits();
+      refreshCredits();
     }
     notifyListeners();
   }
