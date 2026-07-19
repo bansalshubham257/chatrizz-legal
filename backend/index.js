@@ -126,7 +126,7 @@ app.post('/auth/google', async (req, res) => {
        VALUES ($1, $2, $3, $4, 10)
        ON CONFLICT (google_id)
        DO UPDATE SET email = EXCLUDED.email, display_name = EXCLUDED.display_name,
-                     encrypted_data = EXCLUDED.encrypted_data, credits = 10,
+                     encrypted_data = EXCLUDED.encrypted_data,
                      deleted_at = NULL, updated_at = NOW()
        RETURNING id, google_id, credits, created_at`,
       [googleId, email, displayName, encryptedData]
@@ -216,7 +216,7 @@ app.delete('/user', authMiddleware, async (req, res) => {
   try {
     await pool.query(
       `UPDATE chatrizz.users
-       SET deleted_at = NOW(), email = NULL, display_name = NULL, encrypted_data = NULL, credits = 0
+       SET deleted_at = NOW(), email = NULL, display_name = NULL, encrypted_data = NULL
        WHERE id = $1`,
       [req.user.userId]
     );
