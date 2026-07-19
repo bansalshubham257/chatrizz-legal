@@ -13,11 +13,11 @@ class MatchListController extends ChangeNotifier {
   final AdService _adService;
   final ApiService _apiService;
   StreamSubscription? _subscription;
-  StreamSubscription? _apiSub;
   List<MatchEntity> _matches = [];
   bool _isLoading = true;
   int _credits = AppConstants.freeCredits;
   int _pendingAdRewards = 0;
+  VoidCallback? _apiListener;
 
   MatchListController(this._matchRepository, this._localDataSource, this._adService, this._apiService) {
     _init();
@@ -30,7 +30,8 @@ class MatchListController extends ChangeNotifier {
   int get pendingAdRewards => _pendingAdRewards;
 
   void _init() {
-    _apiSub = _apiService.addListener(_loadCredits);
+    _apiListener = _loadCredits;
+    _apiService.addListener(_apiListener!);
     _localDataSource.changeNotifier.addListener(_onDataChanged);
     _subscription = _matchRepository.getMatches().listen((matches) {
       _matches = matches;
@@ -73,7 +74,7 @@ class MatchListController extends ChangeNotifier {
   @override
   void dispose() {
     _subscription?.cancel();
-    _apiSub?.cancel();
+    if (_apiListener != null) _apiService.removeListener(_apiListener!);
     _localDataSource.changeNotifier.removeListener(_onDataChanged);
     super.dispose();
   }
