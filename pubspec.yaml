@@ -1,7 +1,7 @@
 name: chatrizz
 description: "AI Dating Assistant That Remembers Every Match"
 publish_to: 'none'
-version: 2.2.0+5
+version: 2.3.0+6
 
 environment:
   sdk: ^3.9.2
