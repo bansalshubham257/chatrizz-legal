@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:google_sign_in/google_sign_in.dart';
 
 class ApiService extends ChangeNotifier {
-  static const _baseUrl = 'https://YOUR_RAILWAY_URL.up.railway.app';
+  static const _baseUrl = 'https://chatrizz-production.up.railway.app';
   static const _tokenKey = 'auth_token';
 
   String? _token;
