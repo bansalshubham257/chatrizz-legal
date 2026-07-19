@@ -108,6 +108,12 @@ class OverlayService extends ChangeNotifier {
     _groqApiKey = key;
   }
 
+  Future<void> clearPendingCredits() async {
+    try {
+      await _channel.invokeMethod('clearPendingCreditDeductions');
+    } catch (_) {}
+  }
+
   Future<void> stop() async {
     try {
       await deductPendingCredits();

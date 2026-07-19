@@ -44,6 +44,7 @@ class MatchDetailController extends ChangeNotifier {
   StreamSubscription? _matchSub;
   StreamSubscription? _messageSub;
   StreamSubscription? _memorySub;
+  StreamSubscription? _apiSub;
 
   MatchDetailController({
     required MatchRepository matchRepository,
@@ -87,6 +88,7 @@ class MatchDetailController extends ChangeNotifier {
   }
 
   void _init() {
+    _apiSub = _apiService.addListener(_onCreditsChanged);
     _matchSub = _matchRepository.getMatches().listen((matches) {
       try {
         _match = matches.firstWhere((m) => m.id == _matchId);
@@ -453,11 +455,16 @@ class MatchDetailController extends ChangeNotifier {
     await _matchRepository.updateMatch(updated);
   }
 
+  void _onCreditsChanged() {
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     _matchSub?.cancel();
     _messageSub?.cancel();
     _memorySub?.cancel();
+    _apiSub?.cancel();
     super.dispose();
   }
 }

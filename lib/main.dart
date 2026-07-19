@@ -120,8 +120,9 @@ class _ChatRizzAppState extends State<ChatRizzApp> {
               overlay.setCategories(user.categories);
             }
             overlay.setGroqApiKey(ApiConfig.groqApiKey);
-            overlay.onCreditUsed = (int amount) {
-              ctx.read<ApiService>().deductCredits(amount);
+            overlay.onCreditUsed = (int amount) async {
+              await ctx.read<ApiService>().deductCredits(amount);
+              await overlay.clearPendingCredits();
             };
             overlay.deductPendingCredits();
             return overlay;

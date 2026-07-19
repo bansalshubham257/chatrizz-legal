@@ -22,6 +22,7 @@ class AiChatController extends ChangeNotifier {
   String _conversationType = 'Stranger (Relationship)';
   String _responseStyle = 'Funny';
   List<String> _categories = ['Funny', 'Flirty', 'Bold'];
+  VoidCallback? _apiListener;
 
   AiChatController({
     required AiRepository aiRepository,
@@ -32,6 +33,8 @@ class AiChatController extends ChangeNotifier {
         _ocrService = ocrService,
         _localDataSource = localDataSource,
         _apiService = apiService {
+    _apiListener = () => notifyListeners();
+    _apiService.addListener(_apiListener!);
     _loadCategories();
   }
 
@@ -145,5 +148,13 @@ class AiChatController extends ChangeNotifier {
     _error = null;
     _needsCredits = false;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    if (_apiListener != null) {
+      _apiService.removeListener(_apiListener!);
+    }
+    super.dispose();
   }
 }

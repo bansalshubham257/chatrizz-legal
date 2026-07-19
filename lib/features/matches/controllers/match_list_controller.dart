@@ -13,6 +13,7 @@ class MatchListController extends ChangeNotifier {
   final AdService _adService;
   final ApiService _apiService;
   StreamSubscription? _subscription;
+  StreamSubscription? _apiSub;
   List<MatchEntity> _matches = [];
   bool _isLoading = true;
   int _credits = AppConstants.freeCredits;
@@ -30,6 +31,7 @@ class MatchListController extends ChangeNotifier {
 
   void _init() {
     _loadCredits();
+    _apiSub = _apiService.addListener(_loadCredits);
     _localDataSource.changeNotifier.addListener(_onDataChanged);
     _subscription = _matchRepository.getMatches().listen((matches) {
       _matches = matches;
@@ -75,6 +77,7 @@ class MatchListController extends ChangeNotifier {
   @override
   void dispose() {
     _subscription?.cancel();
+    _apiSub?.cancel();
     _localDataSource.changeNotifier.removeListener(_onDataChanged);
     super.dispose();
   }
