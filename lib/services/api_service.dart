@@ -7,6 +7,10 @@ import 'package:google_sign_in/google_sign_in.dart';
 class ApiService extends ChangeNotifier {
   static const _baseUrl = 'https://chatrizz-production.up.railway.app';
   static const _tokenKey = 'auth_token';
+  static final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: ['email', 'profile'],
+    serverClientId: '1025432805110-d1f2gcrn3p9ic3qmfnatfskcf81dts4f.apps.googleusercontent.com',
+  );
 
   String? _token;
   int _credits = 0;
@@ -43,7 +47,7 @@ class ApiService extends ChangeNotifier {
         serverClientId: '1025432805110-d1f2gcrn3p9ic3qmfnatfskcf81dts4f.apps.googleusercontent.com',
       );
 
-      final googleUser = await googleSignIn.signIn();
+      final googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
         _loading = false;
         notifyListeners();
@@ -82,6 +86,15 @@ class ApiService extends ChangeNotifier {
     }
   }
 
+  Future<void> _checkUnauthorized(int statusCode) async {
+    if (statusCode == 401) {
+      _token = null;
+      _credits = 0;
+      await _saveToken(null);
+      notifyListeners();
+    }
+  }
+
   Future<int?> refreshCredits() async {
     if (_token == null) return null;
     try {
@@ -95,6 +108,7 @@ class ApiService extends ChangeNotifier {
         notifyListeners();
         return _credits;
       }
+      await _checkUnauthorized(res.statusCode);
     } catch (_) {}
     return null;
   }
@@ -116,6 +130,7 @@ class ApiService extends ChangeNotifier {
         notifyListeners();
         return true;
       }
+      await _checkUnauthorized(res.statusCode);
       return false;
     } catch (_) {
       return false;
@@ -139,6 +154,7 @@ class ApiService extends ChangeNotifier {
         notifyListeners();
         return true;
       }
+      await _checkUnauthorized(res.statusCode);
       return false;
     } catch (_) {
       return false;
@@ -156,6 +172,7 @@ class ApiService extends ChangeNotifier {
         await signOut();
         return true;
       }
+      await _checkUnauthorized(res.statusCode);
       return false;
     } catch (_) {
       return false;
@@ -167,7 +184,7 @@ class ApiService extends ChangeNotifier {
     _credits = 0;
     await _saveToken(null);
     try {
-      await GoogleSignIn().signOut();
+      await _googleSignIn.signOut();
     } catch (_) {}
     notifyListeners();
   }
