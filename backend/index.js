@@ -38,6 +38,30 @@ pool.on('error', (err) => {
 
 const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
+async function initDb() {
+  try {
+    // Create schema and table if they don't exist
+    await pool.query(`
+      CREATE SCHEMA IF NOT EXISTS chatrizz;
+      CREATE TABLE IF NOT EXISTS chatrizz.users (
+        id SERIAL PRIMARY KEY,
+        google_id VARCHAR(255) UNIQUE NOT NULL,
+        email VARCHAR(255),
+        display_name VARCHAR(255),
+        encrypted_data TEXT,
+        credits INTEGER NOT NULL DEFAULT 10,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        deleted_at TIMESTAMP WITH TIME ZONE
+      );
+      CREATE INDEX IF NOT EXISTS idx_users_google_id ON chatrizz.users(google_id);
+    `);
+    console.log('Database initialized');
+  } catch (err) {
+    console.error('Database init error:', err.message);
+  }
+}
+
 function encrypt(text) {
   const iv = crypto.randomBytes(16);
   const cipher = crypto.createCipheriv('aes-256-gcm', Buffer.from(ENCRYPTION_KEY, 'hex').subarray(0, 32), iv);
@@ -211,6 +235,7 @@ app.get('/health', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`ChatRizz backend running on port ${PORT}`);
+  await initDb();
 });
